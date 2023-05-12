@@ -44,10 +44,11 @@ jobs:
           AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           
         run: |
-          cd $GITHUB_WORKSPACE/image/
           sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
           sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
           sudo aws configure set region ${{env.AWS_DEFAULT_REGION}}
+          cd $GITHUB_WORKSPACE/image/
+
           aws ecr get-login-password --region ${{env.AWS_DEFAULT_REGION}} | docker login --username AWS --password-stdin ${{env.DOCKER_REGISTRY}}
           sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
