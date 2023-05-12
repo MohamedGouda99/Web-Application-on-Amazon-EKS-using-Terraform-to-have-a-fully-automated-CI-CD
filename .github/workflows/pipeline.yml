@@ -25,15 +25,7 @@ jobs:
           curl -fsSL https://get.docker.com -o get-docker.sh
           chmod +x get-docker.sh
           ./get-docker.sh
-  # configure-aws-cli:
-  #   needs: install-awcli-docker
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Configure AWS CLI
-  #       run: |
-  #         sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
-  #         sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
-  #         sudo aws configure set region ${{env.AWS_DEFAULT_REGION}}
+  
 
   login-to-ecr-registry:
     needs: install-awcli-docker
@@ -41,8 +33,8 @@ jobs:
     steps:
       - name: Login to ECR registry
         run: |
-         sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
-         sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
+         sudo aws configure set aws_access_key_id ${{env.AWS_ACCESS_KEY}}
+         sudo aws configure set aws_secret_access_key ${{env.AWS_SECRET_ACCESS}}
          sudo aws configure set region ${{env.AWS_DEFAULT_REGION}}
          aws ecr get-login-password | docker login -u AWS --password-stdin ${{env.DOCKER_REGISTRY}}
 
