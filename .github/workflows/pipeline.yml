@@ -36,7 +36,7 @@ jobs:
   #         sudo aws configure set region ${{env.AWS_DEFAULT_REGION}}
 
   login-to-ecr-registry:
-    # needs: configure-aws-cli
+    needs: install-awcli-docker
     runs-on: ubuntu-latest
     steps:
       - name: Login to ECR registry
