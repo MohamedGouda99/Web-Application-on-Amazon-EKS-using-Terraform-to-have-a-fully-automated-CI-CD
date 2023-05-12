@@ -41,7 +41,7 @@ jobs:
     steps:
       - name: Login to ECR registry
         run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 063965251904.dkr.ecr.us-east-1.amazonaws.com
+          sudo $(aws ecr get-login --no-include-email | sed 's|https://||') && sudo docker login -u AWS -p $(aws ecr get-login-password | sed 's|AWS\ \-\-password\-stdin\ ||') $DOCKER_REGISTRY
 
   build-and-push-Docker-image-to-ECR:
     needs: login-to-ecr-registry
