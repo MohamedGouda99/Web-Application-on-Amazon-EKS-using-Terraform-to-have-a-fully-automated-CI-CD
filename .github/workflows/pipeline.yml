@@ -41,7 +41,7 @@ jobs:
     steps:
       - name: Login to ECR registry
         run: |
-          sudo $(aws ecr get-login --no-include-email | sed 's|https://||') && sudo docker login -u AWS -p $(aws ecr get-login-password | sed 's|AWS\ \-\-password\-stdin\ ||') $DOCKER_REGISTRY
+          sudo $(aws ecr get-login --no-include-email | sed 's|https://||') && sudo docker login -u AWS -p $(aws ecr get-login-password | sed 's|AWS\ \-\-password\-stdin\ ||') ${{env.DOCKER_REGISTRY}}
 
   build-and-push-Docker-image-to-ECR:
     needs: login-to-ecr-registry
@@ -49,8 +49,8 @@ jobs:
     steps:
       - name: build_and_push
         run: |
-          sudo docker build -t $DOCKER_REGISTRY/${{env.APP_NAME}}:${{ github.run_number }} .
-          sudo docker push $DOCKER_REGISTRY/${{env.APP_NAME}}:${{ github.run_number }}
+          sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
+          sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
         env:
           AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
           DOCKER_REGISTRY: ${{ env.DOCKER_REGISTRY }}
