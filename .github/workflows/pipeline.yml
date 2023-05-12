@@ -8,6 +8,8 @@ env:
   DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
   AWS_DEFAULT_REGION: us-east-1
   APP_NAME: php-app
+  AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
+  AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
 jobs:
   publish:
@@ -21,8 +23,8 @@ jobs:
           sudo apt-get -y install awscli docker.io
       - name: Configure AWS CLI
         run: |
-          sudo aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          sudo aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
+          sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
           sudo aws configure set region $AWS_DEFAULT_REGION
       - name: Login to ECR registry
         run: |
