@@ -50,9 +50,6 @@ jobs:
     steps:
       - name: build_and_push
         run: |
-          sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
+          sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} -f ./Dockerfile .
           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
-        env:
-          AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
-          DOCKER_REGISTRY: ${{ env.DOCKER_REGISTRY }}
-          APP_NAME: ${{ env.APP_NAME }}
+        
