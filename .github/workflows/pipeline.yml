@@ -52,7 +52,7 @@ jobs:
     steps:
       - name: navigate to the image folder
         run: |
-          cd -Web-Application-on-Amazon-EKS-using-Terraform-to-have-a-fully-automated-CI-CD/image/
+          cd $GITHUB_WORKSPACE/image/
           ls -la
       - name: build_and_push
         run: |
