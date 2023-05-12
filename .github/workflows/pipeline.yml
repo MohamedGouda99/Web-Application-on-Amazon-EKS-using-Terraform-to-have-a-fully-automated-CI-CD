@@ -2,7 +2,7 @@ name: Publish Docker image to ECR
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
 
 env:
   DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
