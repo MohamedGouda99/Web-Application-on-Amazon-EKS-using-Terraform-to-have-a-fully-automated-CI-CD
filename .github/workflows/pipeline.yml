@@ -1,3 +1,60 @@
+# name: Publish Docker image to ECR
+
+# on:
+#   push:
+#     branches: ["main"]
+
+# env:
+#   DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
+#   AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
+#   APP_NAME: nginx-app
+#   AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
+#   AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
+# jobs:
+#   install-awcli-docker:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+#       - name: Install AWS CLI and Docker
+#         run: |
+#           sudo apt-get update
+#           sudo apt-get -y install awscli 
+#           sudo apt-get -y install curl
+#           curl -fsSL https://get.docker.com -o get-docker.sh
+#           chmod +x get-docker.sh
+#           ./get-docker.sh
+
+#   build-and-push-Docker-image-to-ECR:
+#     needs: [install-awcli-docker]
+    
+    
+#     runs-on: ubuntu-latest
+#     steps:    
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: build_and_push
+#         env:
+#           DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
+#           AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
+#           APP_NAME: nginx-app
+#           AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
+#           AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          
+#         run: |
+#           sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
+#           sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
+#           sudo aws configure set region ${{env.AWS_DEFAULT_REGION}}
+#           cd $GITHUB_WORKSPACE/image/
+
+#           aws ecr get-login-password --region ${{env.AWS_DEFAULT_REGION}} | docker login --username AWS --password-stdin ${{env.DOCKER_REGISTRY}}
+#           sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
+#           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
+
+
+
 name: Publish Docker image to ECR
 
 on:
@@ -25,30 +82,35 @@ jobs:
           curl -fsSL https://get.docker.com -o get-docker.sh
           chmod +x get-docker.sh
           ./get-docker.sh
-
-  build-and-push-Docker-image-to-ECR:
-    needs: [install-awcli-docker]
-    
-    
+  configure-aws-cli:
+    needs: install-awcli-docker
     runs-on: ubuntu-latest
-    steps:    
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: build_and_push
-        env:
-          DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
-          AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
-          APP_NAME: nginx-app
-          AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          
+    steps:
+      - name: Configure AWS CLI
         run: |
           sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
           sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
           sudo aws configure set region ${{env.AWS_DEFAULT_REGION}}
-          cd $GITHUB_WORKSPACE/image/
+  login-to-ecr-registry:
+    needs: configure-aws-cli
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to ECR registry
+        run: |
+         aws ecr get-login-password --region ${{env.AWS_DEFAULT_REGION}} | docker login --username AWS --password-stdin ${{env.DOCKER_REGISTRY}}
+  build-and-push-Docker-image-to-ECR:
+    needs: login-to-ecr-registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-          aws ecr get-login-password --region ${{env.AWS_DEFAULT_REGION}} | docker login --username AWS --password-stdin ${{env.DOCKER_REGISTRY}}
+      - name: build_and_push
+        run: |
+          cd $GITHUB_WORKSPACE/image/
           sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
+        env:
+          AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
+          DOCKER_REGISTRY: ${{ env.DOCKER_REGISTRY }}
+          APP_NAME: ${{ env.APP_NAME }}
