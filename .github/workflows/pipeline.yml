@@ -20,7 +20,11 @@ jobs:
       - name: Install AWS CLI and Docker
         run: |
           sudo apt-get update
-          sudo apt-get -y install awscli docker.io
+          sudo apt-get -y install awscli 
+          sudo apt-get -y install curl
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          chmod +x get-docker.sh
+          ./get-docker.sh
       - name: Configure AWS CLI
         run: |
           sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
