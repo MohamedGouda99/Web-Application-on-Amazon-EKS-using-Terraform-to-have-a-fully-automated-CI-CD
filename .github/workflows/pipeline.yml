@@ -12,7 +12,7 @@ env:
   AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
 jobs:
-  install_awcli_docker:
+  install-awcli-docker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,8 +25,8 @@ jobs:
           curl -fsSL https://get.docker.com -o get-docker.sh
           chmod +x get-docker.sh
           ./get-docker.sh
-  configure_aws_cli:
-    needs: install_awscli_docker
+  configure-aws-cli:
+    needs: install-awscli-docker
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS CLI
@@ -36,14 +36,14 @@ jobs:
           sudo aws configure set region $AWS_DEFAULT_REGION
 
   login-to-ecr-registry:
-    needs: configure_aws_cli
+    needs: configure-aws-cli
     runs-on: ubuntu-latest
     steps:
       - name: Login to ECR registry
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 063965251904.dkr.ecr.us-east-1.amazonaws.com
 
-  Build_and_push_Docker_image_to_ECR:
+  build-and-push-Docker-image-to-ECR:
     needs: login-to-ecr-registry
     runs-on: ubuntu-latest
     steps:
