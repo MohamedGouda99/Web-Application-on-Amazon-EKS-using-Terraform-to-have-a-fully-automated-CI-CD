@@ -49,15 +49,12 @@ jobs:
       DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
       APP_NAME: nginx-app
     runs-on: ubuntu-latest
-    steps:
+    steps:    
       - name: Checkout code
         uses: actions/checkout@v2
 
-      
-
-     
-
       - name: build_and_push
         run: |
+          cd $GITHUB_WORKSPACE/image/
           sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
