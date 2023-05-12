@@ -1,0 +1,37 @@
+name: Publish Docker image to ECR
+
+on:
+  push:
+    branches: ["master"]
+
+env:
+  DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
+  AWS_DEFAULT_REGION: us-east-1
+  APP_NAME: php-app
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install AWS CLI and Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install awscli docker.io
+      - name: Configure AWS CLI
+        run: |
+          sudo aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          sudo aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          sudo aws configure set region $AWS_DEFAULT_REGION
+      - name: Login to ECR registry
+        run: |
+          sudo $(aws ecr get-login --no-include-email | sed 's|https://||') && sudo docker login -u AWS -p $(aws ecr get-login-password | sed 's|AWS\ \-\-password\-stdin\ ||') $DOCKER_REGISTRY
+      - name: Build and push Docker image to ECR
+        run: |
+          sudo docker build -t $DOCKER_REGISTRY/$APP_NAME:${{ github.run_number }} .
+          sudo docker push $DOCKER_REGISTRY/$APP_NAME:${{ github.run_number }}
+        env:
+          AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
+          DOCKER_REGISTRY: ${{ env.DOCKER_REGISTRY }}
+          APP_NAME: ${{ env.APP_NAME }}
