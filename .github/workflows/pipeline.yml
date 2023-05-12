@@ -50,6 +50,6 @@ jobs:
     steps:
       - name: build_and_push
         run: |
-          sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} -f ../Dockerfile 
+          sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} -f ../Dockerfile .
           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
         
