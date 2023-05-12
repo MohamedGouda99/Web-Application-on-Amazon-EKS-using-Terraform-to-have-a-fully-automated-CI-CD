@@ -25,7 +25,7 @@ jobs:
           curl -fsSL https://get.docker.com -o get-docker.sh
           chmod +x get-docker.sh
           ./get-docker.sh
-  configure-aws-cli:
+  configure_aws_cli:
     needs: install_awscli_docker
     runs-on: ubuntu-latest
     steps:
@@ -36,7 +36,7 @@ jobs:
           sudo aws configure set region $AWS_DEFAULT_REGION
 
   login-to-ecr-registry:
-    needs: configure-aws-cli
+    needs: configure_aws_cli
     runs-on: ubuntu-latest
     steps:
       - name: Login to ECR registry
