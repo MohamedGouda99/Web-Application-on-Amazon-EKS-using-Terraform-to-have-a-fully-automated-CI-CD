@@ -50,14 +50,17 @@ jobs:
       APP_NAME: nginx-app
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: navigate to the image folder
         run: |
           cd $GITHUB_WORKSPACE/image/
           ls -la
-
+          
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: build_and_push
         run: |
           sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
