@@ -25,23 +25,9 @@ jobs:
           curl -fsSL https://get.docker.com -o get-docker.sh
           chmod +x get-docker.sh
           ./get-docker.sh
-  
-
-  login-to-ecr-registry:
-    needs: install-awcli-docker
-    runs-on: ubuntu-latest
-    steps:
-      - name: Login to ECR registry
-        env:
-          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
-        run: |
-          aws ecr get-login-password --region ${{secrets.AWS_DEFAULT_REGION}} | docker login --username AWS --password-stdin ${{secrets.ECR_REPO_URL}}
-
-
+          
   build-and-push-Docker-image-to-ECR:
-    needs: [install-awcli-docker,login-to-ecr-registry]
+    needs: [install-awcli-docker]
     env:
       AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
       AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
@@ -56,5 +42,6 @@ jobs:
       - name: build_and_push
         run: |
           cd $GITHUB_WORKSPACE/image/
+          aws ecr get-login-password --region ${{secrets.AWS_DEFAULT_REGION}} | docker login --username AWS --password-stdin ${{secrets.ECR_REPO_URL}}
           sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
