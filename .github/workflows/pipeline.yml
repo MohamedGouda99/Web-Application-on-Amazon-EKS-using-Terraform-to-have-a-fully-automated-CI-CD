@@ -50,9 +50,11 @@ jobs:
       APP_NAME: nginx-app
     runs-on: ubuntu-latest
     steps:
-      - name: build_and_push
+      - name: navigate to the image folder
         run: |
           cd image
+          ls -la
+      - name: build_and_push
+        run: |
           sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
-        
