@@ -33,7 +33,7 @@ jobs:
         run: |
           sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
           sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
-          sudo aws configure set region $AWS_DEFAULT_REGION
+          sudo aws configure set region ${{env.AWS_DEFAULT_REGION}}
 
   login-to-ecr-registry:
     needs: configure-aws-cli
