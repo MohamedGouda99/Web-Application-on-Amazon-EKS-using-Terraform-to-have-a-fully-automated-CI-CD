@@ -25,13 +25,16 @@ jobs:
           curl -fsSL https://get.docker.com -o get-docker.sh
           chmod +x get-docker.sh
           ./get-docker.sh
-      - name: Configure AWS CLI
-        run: |
-          sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
-          sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
-          sudo aws configure set region $AWS_DEFAULT_REGION
+      # - name: Configure AWS CLI
+      #   run: |
+      #     sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
+      #     sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
+      #     sudo aws configure set region $AWS_DEFAULT_REGION
       - name: Login to ECR registry
         run: |
+         sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
+         sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
+         sudo aws configure set region $AWS_DEFAULT_REGION
          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 063965251904.dkr.ecr.us-east-1.amazonaws.com
       - name: Build and push Docker image to ECR
         run: |
