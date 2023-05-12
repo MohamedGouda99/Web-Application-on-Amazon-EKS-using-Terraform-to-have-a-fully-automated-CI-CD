@@ -12,7 +12,7 @@ env:
   AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
 jobs:
-  publish:
+  install_awcli_docker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,18 +25,29 @@ jobs:
           curl -fsSL https://get.docker.com -o get-docker.sh
           chmod +x get-docker.sh
           ./get-docker.sh
-      # - name: Configure AWS CLI
-      #   run: |
-      #     sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
-      #     sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
-      #     sudo aws configure set region $AWS_DEFAULT_REGION
+  configure-aws-cli:
+    needs: install_awscli_docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS CLI
+        run: |
+          sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
+          sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
+          sudo aws configure set region $AWS_DEFAULT_REGION
+
+  login-to-ecr-registry:
+    needs: configure-aws-cli
+    runs-on: ubuntu-latest
+    steps:
       - name: Login to ECR registry
         run: |
-         sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
-         sudo aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS }}
-         sudo aws configure set region $AWS_DEFAULT_REGION
-         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 063965251904.dkr.ecr.us-east-1.amazonaws.com
-      - name: Build and push Docker image to ECR
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 063965251904.dkr.ecr.us-east-1.amazonaws.com
+
+  Build_and_push_Docker_image_to_ECR:
+    needs: login-to-ecr-registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: build_and_push
         run: |
           sudo docker build -t $DOCKER_REGISTRY/${{env.APP_NAME}}:${{ github.run_number }} .
           sudo docker push $DOCKER_REGISTRY/${{env.APP_NAME}}:${{ github.run_number }}
