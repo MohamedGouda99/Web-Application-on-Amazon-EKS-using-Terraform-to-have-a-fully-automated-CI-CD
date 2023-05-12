@@ -42,7 +42,7 @@ jobs:
           APP_NAME: nginx-app
           AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          APP_NAME: nginx-app
+          
         run: |
           cd $GITHUB_WORKSPACE/image/
           sudo aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
