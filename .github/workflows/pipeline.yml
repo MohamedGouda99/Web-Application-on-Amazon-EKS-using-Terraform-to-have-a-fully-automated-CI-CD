@@ -44,6 +44,9 @@ jobs:
           APP_NAME: nginx-app
         run: |
           cd $GITHUB_WORKSPACE/image/
+          aws configure set aws_access_key_id ${{env.AWS_ACCESS_KEY}}
+          aws configure set aws_secret_access_key ${{env.AWS_SECRET_ACCESS-KEY}}
+          aws configure set aws_default_region ${{env.AWS_DEFAULT_REGION}}
           aws ecr get-login-password --region ${{secrets.AWS_DEFAULT_REGION}} | docker login --username AWS --password-stdin ${{secrets.ECR_REPO_URL}}
           sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
