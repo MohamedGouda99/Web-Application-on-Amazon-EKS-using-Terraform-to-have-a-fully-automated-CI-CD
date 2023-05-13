@@ -61,6 +61,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         uses: docker/build-push-action@v2
         with:
-          context: $GITHUB_WORKSPACE/image/
+          context: .
           push: true
           tags: ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
