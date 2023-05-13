@@ -52,9 +52,12 @@ jobs:
 
       - name: Build and push Docker image to ECR
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ github.run_number }}
+          DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
+          AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
+          APP_NAME: nginx-app
+          AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+       
+          sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
+          sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
