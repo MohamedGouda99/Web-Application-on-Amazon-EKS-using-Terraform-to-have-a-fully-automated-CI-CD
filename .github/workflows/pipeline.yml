@@ -50,6 +50,9 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Build and push Docker image to ECR
         env:
           DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
@@ -58,6 +61,6 @@ jobs:
           AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         run: |
-       
+          cd $GITHUB_WORKSPACE/image/
           sudo docker build -t ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }} .
           sudo docker push ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
