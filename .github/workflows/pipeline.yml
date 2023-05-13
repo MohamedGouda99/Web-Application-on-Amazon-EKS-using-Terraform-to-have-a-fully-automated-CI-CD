@@ -29,5 +29,5 @@ jobs:
         ECR_REPO: ${{ secrets.ECR_REPOSITORY }}
       run: |
         cd $GITHUB_WORKSPACE/docker-image
-        docker build -t $ECR_REGISTRY/$ECR_REPO:${{ github.run_number }} .
-        docker push $ECR_REGISTRY/$ECR_REPO:${{ github.run_number }}
+        docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }} .
+        docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }}
