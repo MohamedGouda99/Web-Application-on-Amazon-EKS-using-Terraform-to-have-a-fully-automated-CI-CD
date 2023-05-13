@@ -64,3 +64,4 @@ jobs:
           context: .
           push: true
           tags: ${{env.DOCKER_REGISTRY}}/${{env.APP_NAME}}:${{ github.run_number }}
+          timeout: 300s
