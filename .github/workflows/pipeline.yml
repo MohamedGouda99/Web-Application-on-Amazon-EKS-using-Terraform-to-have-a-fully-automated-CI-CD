@@ -56,7 +56,9 @@ jobs:
 
     
 
-
+    - name: Checkout
+      uses: actions/checkout@v2
+      
     - name: Verify deployment
       run: |
         cd $GITHUB_WORKSPACE/k8s-manifests
