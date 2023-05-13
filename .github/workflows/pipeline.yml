@@ -33,6 +33,7 @@ jobs:
         docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }}
 
   update-kubeconfig:
+    needs: build-and-push
     name: Update kubeconfig
     runs-on: ubuntu-latest
     steps:
