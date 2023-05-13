@@ -15,6 +15,6 @@ spec: # Dictionary
     spec:
       containers: # List
         - name: myapp1-container
-          image: 063965251904.dkr.ecr.us-east-1.amazonaws.com/nginx-app:86
+          image: 063965251904.dkr.ecr.us-east-1.amazonaws.com/nginx-app:87
           ports:
             - containerPort: 80
