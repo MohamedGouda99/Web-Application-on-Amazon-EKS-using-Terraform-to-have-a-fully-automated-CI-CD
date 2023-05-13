@@ -103,7 +103,7 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       env:
         DOCKER_REGISTRY: ${{secrets.ECR_REPO_URL}}
-        APP_NAME: ngnix-app
+        APP_NAME: nginx-app
         
         
       run: |
