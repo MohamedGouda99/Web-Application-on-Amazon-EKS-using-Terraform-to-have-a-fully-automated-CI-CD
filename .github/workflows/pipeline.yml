@@ -1,67 +1,125 @@
-name: Build and Push Image to AWS ECR
-on:
-  push:
-    branches: [ main ]
+# name: Build and Push Image to AWS ECR
+# on:
+#   push:
+#     branches: [ main ]
 
-jobs:
-  build-and-push: 
-    name: Build and Push to ECR
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+# jobs:
+#   build-and-push: 
+#     name: Build and Push to ECR
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout
+#       uses: actions/checkout@v2
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+#     - name: Configure AWS credentials
+#       uses: aws-actions/configure-aws-credentials@v1
+#       with:
+#         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+#     - name: Login to Amazon ECR
+#       id: login-ecr
+#       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, Tag, and Push the Image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPO: ${{ secrets.ECR_REPOSITORY }}
-      run: |
-        cd $GITHUB_WORKSPACE/docker-image
-        docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }} .
-        docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }}
+#     - name: Build, Tag, and Push the Image to Amazon ECR
+#       id: build-image
+#       env:
+#         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#         ECR_REPO: ${{ secrets.ECR_REPOSITORY }}
+#       run: |
+#         cd $GITHUB_WORKSPACE/docker-image
+#         docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }} .
+#         docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }}
 
-  update-kubeconfig:
-    needs: build-and-push
-    name: Update kubeconfig
-    runs-on: ubuntu-latest
-    steps:
+#   update-kubeconfig:
+#     needs: build-and-push
+#     name: Update kubeconfig
+#     runs-on: ubuntu-latest
+#     steps:
 
-    - name: Install kubectl
-      uses: azure/setup-kubectl@v2.0
-      with:
-        version: "v1.24.0"
-      id: install
+#     - name: Install kubectl
+#       uses: azure/setup-kubectl@v2.0
+#       with:
+#         version: "v1.24.0"
+#       id: install
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+#     - name: Configure AWS Credentials
+#       uses: aws-actions/configure-aws-credentials@v1
+#       with:
+#         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
-    - name: Update kube config
-      run: aws eks update-kubeconfig --name hr-stag-eksdemo1 --region us-east-1
+#     - name: Update kube config
+#       run: aws eks update-kubeconfig --name hr-stag-eksdemo1 --region us-east-1
 
     
 
-    - name: Checkout
-      uses: actions/checkout@v2
+#     - name: Checkout
+#       uses: actions/checkout@v2
 
-    - name: Verify deployment
-      run: |
+#     - name: Verify deployment
+#       run: |
         
-        kubectl apply -f /k8s-manifests/1-deployment.yml
-        kubectl apply -f /k8s-manifests/2-service.yml
-        kubectl apply -f /k8s-manifests/3-ingress.yml
+#         kubectl apply -f /k8s-manifests/1-deployment.yml
+#         kubectl apply -f /k8s-manifests/2-service.yml
+#         kubectl apply -f /k8s-manifests/3-ingress.yml
+
+
+name: Build and Deploy to ECR and EKS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    name: Build, Push, and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, Tag, and Push the Image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPO: ${{ secrets.ECR_REPOSITORY }}
+        run: |
+          cd $GITHUB_WORKSPACE/docker-image
+          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:${{ github.run_number }} .
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:${{ github.run_number }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v2.0
+        with:
+          version: "1.24.0"
+        id: install-kubectl
+
+      - name: Configure AWS Credentials for kubectl
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name hr-stag-eksdemo1 --region us-east-1
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f /k8s-manifests/1-deployment.yml
+          kubectl apply -f /k8s-manifests/2-service.yml
+          kubectl apply -f /k8s-manifests/3-ingress.yml
