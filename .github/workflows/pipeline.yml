@@ -61,7 +61,7 @@ jobs:
 
     - name: Verify deployment
       run: |
-        cd ..
-        kubectl apply -f 1-deployment.yml
-        kubectl apply -f 2-service.yml
-        kubectl apply -f 3-ingress.yml
+        
+        kubectl apply -f /k8s-manifests/1-deployment.yml
+        kubectl apply -f /k8s-manifests/2-service.yml
+        kubectl apply -f /k8s-manifests/3-ingress.yml
