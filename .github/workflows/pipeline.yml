@@ -4,7 +4,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-push: 
+  build-and-push:
     name: Build and Push to ECR
     runs-on: ubuntu-latest
     steps:
@@ -31,7 +31,6 @@ jobs:
         cd $GITHUB_WORKSPACE/docker-image
         docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }} .
         docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }}
-
   update-kubeconfig:
     needs: build-and-push
     name: Update kubeconfig
@@ -58,16 +57,12 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
     - name: Verify deployment
       run: |
-        cd $GITHUB_WORKSPACE/k8s-manifests
-        kubectl apply -f 1-deployment.yml
-        kubectl apply -f 2-service.yml
-        kubectl apply -f 3-ingress.yml
+         cd $GITHUB_WORKSPACE/k8s-manifests
+         kubectl apply -f 1-deployment.yml
+         kubectl apply -f 2-service.yml
+         kubectl apply -f 3-ingress.yml
+         kubectl get ing
+          
