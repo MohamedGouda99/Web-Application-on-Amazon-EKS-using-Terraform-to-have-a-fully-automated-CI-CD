@@ -61,7 +61,7 @@ jobs:
 
     - name: Verify deployment
       run: |
-        cd $GITHUB_WORKSPACE/k8s-manifests
+        cd ..
         kubectl apply -f 1-deployment.yml
         kubectl apply -f 2-service.yml
         kubectl apply -f 3-ingress.yml
