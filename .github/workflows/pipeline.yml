@@ -50,6 +50,8 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name hr-stag-eksdemo1 --region us-east-1
 
     
 
@@ -59,7 +61,6 @@ jobs:
     - name: Verify deployment
       run: |
          cd $GITHUB_WORKSPACE/k8s-manifests
-         aws eks update-kubeconfig --name hr-stag-eksdemo1 --region us-east-1
          kubectl apply -f 1-deployment.yml
          kubectl apply -f 2-service.yml
          kubectl apply -f 3-ingress.yml
