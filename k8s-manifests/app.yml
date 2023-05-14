@@ -1,51 +1,48 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: webapp
+  name: my-app1
+  labels:
+    app: app1
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: webapp
-  template:
-    metadata:
-      labels:
-        app: webapp
-    spec:
-      containers:
-        - name: webapp
-          image: 063965251904.dkr.ecr.us-east-1.amazonaws.com/nginx-app:90
-          ports:
-            - containerPort: 8080
+  containers:
+    - name: my-app1
+      image: 063965251904.dkr.ecr.us-east-1.amazonaws.com/nginx-app:91
+      volumeMounts:
+        - name: html-volume
+          mountPath: /var/www/html
+  volumes:
+    - name: html-volume
+      emptyDir: {}
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp
+  name: my-app1-service
 spec:
-  type: ClusterIP
   selector:
-    app: webapp
+    app: app1
   ports:
     - protocol: TCP
       port: 8080
-      targetPort: 8080
+      targetPort: 80
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: webapp
+  name: simple-fanout-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-    - host: php-app.com
-      http:
+    - http:
         paths:
-          - path: /webapp
+          - path: /app1
             pathType: Prefix
             backend:
               service:
-                name: webapp
+                name: my-app1-service
                 port:
-                  name: http
+                  number: 8080
