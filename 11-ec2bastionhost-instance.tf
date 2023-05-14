@@ -1,6 +1,5 @@
 module "ec2_public" {
-  source = "terraform-aws-modules/ec2-instance/aws"
-  #version = "3.3.0"
+  source  = "terraform-aws-modules/ec2-instance/aws"
   version = "5.0.0"
 
   # insert the required variables here
