@@ -56,16 +56,15 @@ jobs:
 
     
 
-    - name: Checkout
-      uses: actions/checkout@v2
-      
-    - name: Verify deployment
-      run: |
-        cd $GITHUB_WORKSPACE/k8s-manifests
-        kubectl apply -f deployment.yml
-        kubectl apply -f clb-service.yml
-        kubectl apply -f nodeport-service.yml
-        kubectl apply -f nlb.yml
+    # - name: Checkout
+    #   uses: actions/checkout@v2
 
-        kubectl get pods
-        kubectl get svc 
+    # - name: Verify deployment
+    #   run: |
+    #     cd $GITHUB_WORKSPACE/k8s-manifests
+    #     kubectl apply -f deployment.yml
+    #     kubectl apply -f clb-service.yml
+    #     kubectl apply -f nodeport-service.yml
+    #     kubectl apply -f nlb.yml
+    #     kubectl get pods
+    #     kubectl get svc 
