@@ -31,6 +31,7 @@ jobs:
         cd $GITHUB_WORKSPACE/docker-image
         docker build -t ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }} .
         docker push ${{env.ECR_REGISTRY}}/${{env.ECR_REPO}}:${{ github.run_number }}
+
   update-kubeconfig:
     needs: build-and-push
     name: Update kubeconfig
@@ -54,16 +55,12 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Update kube config
+      run: aws eks update-kubeconfig --name hr-stag-eksdemo1 --region us-east-1 
+
+    - name: Deploy Manifests
       run: |
-       aws eks update-kubeconfig --name my-eks --region us-east-1
        cd $GITHUB_WORKSPACE/k8s-manifests
        kubectl apply -f 1-deployment.yml
        kubectl apply -f 2-service.yml
        kubectl apply -f 3-ingress.yml
        kubectl get ing
-
-    
-
-   
-         
-          
