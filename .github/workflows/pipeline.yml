@@ -55,7 +55,7 @@ jobs:
 
     - name: Update kube config
       run: |
-       aws eks update-kubeconfig --name hr-dev-eksdemo1 --region us-east-1
+       aws eks update-kubeconfig --name my-eks --region us-east-1
        cd $GITHUB_WORKSPACE/k8s-manifests
        kubectl apply -f 1-deployment.yml
        kubectl apply -f 2-service.yml
